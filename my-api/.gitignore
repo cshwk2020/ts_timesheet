@@ -1,0 +1,33 @@
+# Dependencies
+/vendor/
+
+# Environment & Secrets (CRITICAL: never commit your live .env)
+.env
+.env.backup
+.env.production
+
+# Laravel Caches & Views
+/storage/*.key
+/storage/app/*
+/storage/framework/cache/*
+/storage/framework/sessions/*
+/storage/framework/views/*
+/storage/logs/*
+!/storage/.gitignore
+!/storage/app/.gitignore
+!/storage/framework/.gitignore
+!/storage/logs/.gitignore
+
+# Database (If using SQLite locally, ignore the file so you don't push local test data)
+/database/*.sqlite
+/database/*.sqlite-journal
+
+# Compiled assets / node modules
+/node_modules
+/public/hot
+/public/storage
+
+# System Files
+.DS_Store
+Thumbs.db
+

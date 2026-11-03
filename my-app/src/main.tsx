@@ -4,13 +4,10 @@ import { Provider } from 'react-redux';
 import { store } from './store/index';
 import './index.css';
 import App from './App.tsx';
-import { TestList } from './components/TestList';
 
 
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
-    <Provider store={store}>
-      <TestList />
-    </Provider>
+      <App />
   </StrictMode>
 );

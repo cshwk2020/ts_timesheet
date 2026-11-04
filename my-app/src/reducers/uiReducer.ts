@@ -1,4 +1,4 @@
-import { UiAction } from "../actions/uiActions"
+import type { UiAction } from "../actions/uiActions"
 
 export type UiState = {
   viewMode: "day" | "week"

@@ -1,6 +1,6 @@
 import React from "react";
 import { useSelector } from "react-redux";
-import { RootState } from "../store";
+import type { RootState } from "../store";
 import { Toolbar } from "./Toolbar";
 import { DayView } from "./DayView";
 import { WeekView } from "./WeekView";

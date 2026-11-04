@@ -1,5 +1,6 @@
 // reducers/taskReducer.ts 或合併入 rootReducer
-import { TaskCategory, Task } from "../types/timesheetTypes";
+import type { TaskCategory, Task } from "../types/timesheetTypes";
+import type { TimesheetAction } from "../actions/timesheetActions";
 
 export type TaskState = {
   taskCategories: TaskCategory[];
@@ -18,7 +19,7 @@ const initialTaskState: TaskState = {
   ]
 };
 
-export const taskReducer = (state = initialTaskState, action: any): TaskState => {
+export const taskReducer = (state = initialTaskState, action: TimesheetAction): TaskState => {
   return state;
 };
 

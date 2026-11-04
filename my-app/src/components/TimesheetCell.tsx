@@ -1,7 +1,7 @@
 import React, { useRef } from "react";
 import { useSelector, useDispatch } from "react-redux";
-import { RootState } from "../store";
-import { DateKey } from "../types/timesheetTypes";
+import type { RootState } from "../store";
+import type { DateKey } from "../types/timesheetTypes";
 
 type TimesheetCellProps = {
   date: DateKey;
@@ -21,8 +21,8 @@ export const TimesheetCell: React.FC<TimesheetCellProps> = ({ date, hour }) => {
     s.timesheet.records.find((r) => r.fromDateTime === targetTimePrefix)
   );
 
-  const tasks = useSelector((s: RootState) => s.tasks.tasks);
-  const task = tasks.find((t) => t.id === record?.taskld);
+  const tasks = useSelector((s: RootState) => s.taskState.tasks);
+  const task = tasks.find((t) => t.id === record?.taskId);
 
   const handleClick = () => {
     if (cellRef.current) {

@@ -1,6 +1,6 @@
-import React, { useState, useEffect } from "react";
+import { useState, useEffect } from "react";
 import { useSelector, useDispatch } from "react-redux";
-import { RootState } from "../store";
+import type{ RootState } from "../store";
 
 // 計算 Popup 位置防出界
 const calculatePopupPosition = (cellRect?: { left: number; bottom: number; top: number }) => {
@@ -28,8 +28,8 @@ const calculatePopupPosition = (cellRect?: { left: number; bottom: number; top: 
 export const CellPopupEditor = () => {
   const dispatch = useDispatch();
   const editor = useSelector((s: RootState) => s.ui.editor);
-  const categories = useSelector((s: RootState) => s.tasks.taskCategories);
-  const tasks = useSelector((s: RootState) => s.tasks.tasks);
+  const categories = useSelector((s: RootState) => s.taskState.taskCategories);
+  const tasks = useSelector((s: RootState) => s.taskState.tasks);
   const records = useSelector((s: RootState) => s.timesheet.records);
 
   // 搵出如果呢個 Cell 已經有 record，順便帶入去做編輯
@@ -46,9 +46,9 @@ export const CellPopupEditor = () => {
   // 當 editor 打開或換咗 Cell，初始化 Local State
   useEffect(() => {
     if (existingRecord) {
-      const t = tasks.find((x) => x.id === existingRecord.taskld);
+      const t = tasks.find((x) => x.id === existingRecord.taskId);
       setCategoryId(t?.taskCategoryId ?? categories[0]?.id ?? "");
-      setTaskId(existingRecord.taskld);
+      setTaskId(existingRecord.taskId);
       setRemark(existingRecord.remark ?? "");
     } else {
       const defaultCat = categories[0]?.id ?? "";

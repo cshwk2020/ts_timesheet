@@ -2,15 +2,15 @@ import type { TimesheetRecord } from "../types/timesheetTypes"
 
 export type TimesheetAction =
   | {
-  	type: "RECORD_ADD"
+  	type: "RECORD_ADD",
   	payload: TimesheetRecord
 	}
   | {
-  	type: "RECORD_UPDATE"
+  	type: "RECORD_UPDATE",
   	payload: TimesheetRecord
 	}
   | {
-  	type: "RECORD_DELETE"
+  	type: "RECORD_DELETE",
   	payload: {
     	id: string
   	}

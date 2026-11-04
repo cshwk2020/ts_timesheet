@@ -1,5 +1,5 @@
-import { TimesheetAction } from "../actions/timesheetActions"
-import { TimesheetRecord } from "../types/timesheetTypes"
+import type { TimesheetAction } from "../actions/timesheetActions"
+import type { TimesheetRecord } from "../types/timesheetTypes"
 
 export type TimesheetState = {
   records: TimesheetRecord[]

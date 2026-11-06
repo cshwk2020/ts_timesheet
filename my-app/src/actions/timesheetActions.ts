@@ -20,12 +20,14 @@ export type TimesheetAction =
   | {
     type: "CHANGE_DAY",
     payload: number // e.g., -1, 1, -7, 7
-    }
-	
-	 | { 
-      type: "SET_DATE_AND_RECORDS"; 
-      payload: { currentDate: DateKey; records: TimesheetRecord[] } 
-    }
+  }
+	| { 
+    type: "SET_DATE_AND_RECORDS",
+    payload: { 
+      currentDate: DateKey,
+      records: TimesheetRecord[] 
+    } 
+  }
 	;
 
 

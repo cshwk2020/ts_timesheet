@@ -39,15 +39,15 @@ export const timesheetReducer = (
         currentDate: newDateStr,
       }
 
-	  case "SET_DATE_AND_RECORDS": {
+	  case "SET_DATE_AND_RECORDS": 
       return {
         ...state,
         currentDate: action.payload.currentDate,
         // Optional: Replace records or merge them. 
         // If fetching single-day data from Laravel, replace/filter records for this date:
         records: action.payload.records,
-      };
-    }
+      }
+    
 	  
 
     case "RECORD_ADD":

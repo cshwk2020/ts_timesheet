@@ -1,11 +1,13 @@
 import type { TimesheetAction } from "../actions/timesheetActions"
-import type { TimesheetRecord } from "../types/timesheetTypes"
+import type { DateKey, TimesheetRecord } from "../types/timesheetTypes"
 
 export type TimesheetState = {
+	currentDate: DateKey,
   records: TimesheetRecord[]
 }
 
 const initialState: TimesheetState = {
+	currentDate: new Date().toISOString().split("T")[0],
   records: [
 	{
   	id: "1",
@@ -26,6 +28,28 @@ export const timesheetReducer = (
   
   switch (action.type) {
 	
+	case "CHANGE_DAY": 
+      const daysToAdd = action.payload; // -1, 1, -7, 7 等
+      const date = new Date(state.currentDate);
+      date.setDate(date.getDate() + daysToAdd);
+      
+      const newDateStr = date.toISOString().split("T")[0];
+      return {
+        ...state,
+        currentDate: newDateStr,
+      }
+
+	  case "SET_DATE_AND_RECORDS": {
+      return {
+        ...state,
+        currentDate: action.payload.currentDate,
+        // Optional: Replace records or merge them. 
+        // If fetching single-day data from Laravel, replace/filter records for this date:
+        records: action.payload.records,
+      };
+    }
+	  
+
     case "RECORD_ADD":
   	return {
     	...state,

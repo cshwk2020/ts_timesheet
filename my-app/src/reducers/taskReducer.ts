@@ -19,7 +19,7 @@ const initialTaskState: TaskState = {
   ]
 };
 
-export const taskReducer = (state = initialTaskState, action: TimesheetAction): TaskState => {
+export const taskReducer = (state = initialTaskState, _action: TimesheetAction): TaskState => {
   return state;
 };
 

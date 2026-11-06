@@ -1,12 +1,14 @@
 import type { UiAction } from "../actions/uiActions"
 
 export type UiState = {
-  viewMode: "day" | "week"
+  viewMode: "day" | "week",
   editor: {
-	open: boolean
-	date?: string
-	hour?: number
-	recordId?: string
+	open: boolean,
+	date?: string,
+	hour?: number,
+	recordId?: string,
+	cellRect?: DOMRect | { top: number; left: number; width: number; height: number
+	}
   }
 }
 

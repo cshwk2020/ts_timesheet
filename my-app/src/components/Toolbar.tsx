@@ -28,7 +28,7 @@ export const Toolbar: React.FC = () => {
       }}
     >
       <div style={{ fontSize: 18, fontWeight: "bold" }}>
-        Timesheet App
+        Timesheet App 
       </div>
 
       <div style={{ display: "flex", gap: 8 }}>
@@ -36,7 +36,6 @@ export const Toolbar: React.FC = () => {
           onClick={() => handleSetViewMode("day")}
           style={{
             padding: "6px 16px",
-            border: "none",
             borderRadius: 4,
             cursor: "pointer",
             fontWeight: "bold",

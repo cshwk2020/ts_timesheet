@@ -44,7 +44,8 @@ export type TimesheetRecord = {
   fromDateTime: DateTimeKey,
   toDateTime: DateTimeKey,
   remark?: string,
-  lastUpdatedAt: DateTimeKey
+  lastUpdatedAt: DateTimeKey,
+  isDirty?: boolean,
 }
 
 

@@ -27,7 +27,53 @@ export const timesheetReducer = (
 ): TimesheetState => {
   
   switch (action.type) {
-	
+
+  
+    case "RECORD_VALUE_CHANGE": {
+      
+      const { id, remark, fromDateTime, toDateTime } = action.payload;
+      
+      const existingIndex = state.records.findIndex(r => r.id === id);
+
+      let updatedRecords = [...state.records];
+      
+      if (existingIndex >= 0) {
+        // Update existing record and flag as dirty
+        updatedRecords[existingIndex] = {
+          ...updatedRecords[existingIndex],
+          ...(remark !== undefined && { remark }),
+          ...(fromDateTime !== undefined && { fromDateTime }),
+          ...(toDateTime !== undefined && { toDateTime }),
+          isDirty: true,
+        };
+        
+      } else {
+        // Add a new unsaved record locally
+        updatedRecords.push({
+          id,
+          userId: state.currentUserId, // or current user context
+          taskId: action.payload.taskId || "",
+          fromDateTime: fromDateTime || `${state.currentDate} 09:00:00`,
+          toDateTime: toDateTime || `${state.currentDate} 10:00:00`,
+          remark,
+          lastUpdatedAt: new Date().toISOString(),
+          isDirty: true,
+        });
+      }
+
+      return { ...state, records: updatedRecords };
+    }
+      
+
+    case "SAVE_SUCCESS": {
+      // Clear the dirty flags after Laravel batch save succeeds
+      return {
+        ...state,
+        records: state.records.map(r => ({ ...r, isDirty: false })),
+      };
+    }
+
+      
 	case "CHANGE_DAY": 
       const daysToAdd = action.payload; // -1, 1, -7, 7 等
       const date = new Date(state.currentDate);
@@ -38,15 +84,18 @@ export const timesheetReducer = (
         ...state,
         currentDate: newDateStr,
       }
+      
 
-	  case "SET_DATE_AND_RECORDS": 
+    case "SET_DATE_AND_RECORDS": {
       return {
         ...state,
         currentDate: action.payload.currentDate,
-        // Optional: Replace records or merge them. 
-        // If fetching single-day data from Laravel, replace/filter records for this date:
-        records: action.payload.records,
-      }
+        records: action.payload.records.map(r => ({ ...r, isDirty: false })),
+      };
+    }
+
+
+      
     
 	  
 

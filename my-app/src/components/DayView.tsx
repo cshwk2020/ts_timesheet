@@ -1,6 +1,8 @@
 import React from "react";
 import { useSelector, useDispatch } from "react-redux";
 import { TimesheetCell } from "./TimesheetCell";
+import type { RootState } from "../store";
+
 
 const HOURS = Array.from({ length: 24 }, (_, i) => i);
 
@@ -13,13 +15,13 @@ const formatDayHeader = (dateStr: string) => {
 };
 
 export const DayView: React.FC = () => {
+  
   const dispatch = useDispatch();
-
-  // 從 Redux Store 取得當前選取的日期 (預設為今天或傳入的預設值)
-  // 請根據你的 store 結構調整 state.timesheet.currentDate
   const currentDate = useSelector((state: any) => state.timesheet.currentDate || new Date().toISOString().split("T")[0]);
 
-  // 切換日期的 Handler
+  
+  // prev next
+  
   const handlePrevDay = () => {
     dispatch({ type: "CHANGE_DAY", payload: -1 });
   };
@@ -27,6 +29,43 @@ export const DayView: React.FC = () => {
   const handleNextDay = () => {
     dispatch({ type: "CHANGE_DAY", payload: 1 });
   };
+
+
+  // save
+
+  const records = useSelector((state: RootState) => state.timesheet.records);
+
+  const hasDirtyCells = records.some(r => r.isDirty);
+
+  const handleSaveAll = async () => {
+    // 1. Filter only dirty records that need saving
+    const dirtyRecords = records.filter(r => r.isDirty);
+
+    if (dirtyRecords.length === 0) return;
+
+    try {
+      // 2. Send batch payload to Laravel API
+      const response = await fetch("http://127.0.0.1:8000/api/timesheets/batch", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          date: currentDate,
+          records: dirtyRecords,
+        }),
+      });
+
+      if (!response.ok) throw new Error("Batch save failed");
+
+      // 3. On success, dispatch action to clear dirty flags
+      dispatch({ type: "SAVE_SUCCESS" });
+      console.log("All dirty cells saved successfully!");
+    } catch (error) {
+      console.error("Error saving timesheet:", error);
+    }
+  };
+
+
+  
 
   return (
     <div
@@ -40,6 +79,7 @@ export const DayView: React.FC = () => {
     >
       {/* Header Row */}
       <div style={{ borderBottom: "2px solid #ccc", padding: 8 }} />
+      
       <div
         style={{
           borderBottom: "2px solid #ccc",
@@ -53,6 +93,7 @@ export const DayView: React.FC = () => {
           alignItems: "center",
         }}
       >
+        
         <button
           onClick={handlePrevDay}
           style={{
@@ -64,8 +105,26 @@ export const DayView: React.FC = () => {
           &lt;
         </button>
 
-        <span>{formatDayHeader(currentDate)}</span>
+        
+        <span>TEST :: {formatDayHeader(currentDate)}</span>
 
+        <button
+          onClick={handleSaveAll}
+          disabled={!hasDirtyCells}
+          style={{
+            backgroundColor: hasDirtyCells ? "#28a745" : "#cccccc",
+            color: "#ffffff",
+            border: "none",
+            padding: "8px 16px",
+            borderRadius: "4px",
+            cursor: hasDirtyCells ? "pointer" : "default",
+            fontWeight: "bold",
+          }}
+        >
+          {hasDirtyCells ? "Save Changes *" : "Saved"}
+        </button>
+
+        
         <button
           onClick={handleNextDay}
           style={{
@@ -106,6 +165,7 @@ export const DayView: React.FC = () => {
               date={currentDate}
               hour={hour}
             />
+            timesheetcell
           </React.Fragment>
         );
       })}

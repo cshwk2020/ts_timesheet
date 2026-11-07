@@ -1,69 +1,50 @@
-import React, { useRef } from "react";
-import { useSelector, useDispatch } from "react-redux";
-import type { RootState } from "../store";
+import React from "react";
+import { useDispatch } from "react-redux";
 import type { DateKey } from "../types/timesheetTypes";
 
-type TimesheetCellProps = {
-  date: DateKey;
+
+interface TimesheetCellProps {
+  date: DateKey;        // 👈 Added date parameter to prevent cross-day collisions
   hour: number;
-};
+  value?: string;
+  isDirty?: boolean;
+}
 
-export const TimesheetCell: React.FC<TimesheetCellProps> = ({ date, hour }) => {
+export const TimesheetCell: React.FC<TimesheetCellProps> = ({ 
+  date, 
+  hour, 
+  value = "", 
+  isDirty 
+}) => {
   const dispatch = useDispatch();
-  const cellRef = useRef<HTMLDivElement>(null);
 
-  // 格式化 hour 變 "HH:00:00" 去對應 fromDateTime
-  const hourStr = hour.toString().padStart(2, "0");
-  const targetTimePrefix = `${date} ${hourStr}:00:00`;
-
-  // 從 Redux 搵出呢個鐘數對應嘅 record
-  const record = useSelector((s: RootState) =>
-    s.timesheet.records.find((r) => r.fromDateTime === targetTimePrefix)
-  );
-
-  const tasks = useSelector((s: RootState) => s.taskState.tasks);
-  const task = tasks.find((t) => t.id === record?.taskId);
-
-  const handleClick = () => {
-    if (cellRef.current) {
-      const rect = cellRef.current.getBoundingClientRect();
-      dispatch({
-        type: "UI_OPEN_EDITOR",
-        payload: {
-          date,
-          hour,
-          recordId: record?.id,
-          cellRect: {
-            left: rect.left,
-            top: rect.top,
-            bottom: rect.bottom,
-            right: rect.right,
-            width: rect.width,
-            height: rect.height,
-          },
-        },
-      });
-    }
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    dispatch({
+      type: "CELL_VALUE_CHANGE",
+      payload: { 
+        date,             // 👈 Send date along to Redux
+        hour, 
+        title: e.target.value 
+      },
+    });
   };
 
   return (
-    <div
-      ref={cellRef}
-      onClick={handleClick}
-      style={{
-        border: "1px solid #e0e0e0",
-        height: 48,
-        padding: "4px 8px",
-        fontSize: "12px",
-        background: record ? "#e3f2fd" : "transparent",
-        cursor: "pointer",
-        overflow: "hidden",
-        whiteSpace: "nowrap",
-        textOverflow: "ellipsis",
-      }}
-    >
-      {task ? task.taskDesc : ""}
+    <div style={{ display: "flex", alignItems: "center", padding: "4px 0" }}>
+      <span style={{ width: 60, fontSize: "12px", color: "#666" }}>
+        {String(hour).padStart(2, "0")}:00
+      </span>
+      <input
+        type="text"
+        value={value}
+        onChange={handleChange}
+        style={{
+          flex: 1,
+          padding: "6px",
+          border: isDirty ? "1px solid #ffc107" : "1px solid #ddd",
+          backgroundColor: isDirty ? "#fffdf5" : "#fff",
+        }}
+      />
     </div>
   );
 };
-

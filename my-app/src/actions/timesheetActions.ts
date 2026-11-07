@@ -1,4 +1,4 @@
-import type { DateKey,TimesheetRecord } from "../types/timesheetTypes"
+import type { DateTimeKey, DateKey,TimesheetRecord } from "../types/timesheetTypes"
   
 import type { Dispatch } from "redux";
 
@@ -28,6 +28,19 @@ export type TimesheetAction =
       records: TimesheetRecord[] 
     } 
   }
+  | {
+      type: "RECORD_VALUE_CHANGE";
+      payload: {
+        id: string;
+        fromDateTime?: DateTimeKey;
+        toDateTime?: DateTimeKey;
+        remark?: string;
+        taskId?: string;
+      }
+    }
+  | {
+      type: "SAVE_SUCCESS";
+    }
 	;
 
 

@@ -5,6 +5,7 @@ import { timesheetReducer } from '../reducers/timesheetReducer';
 //import type { TimesheetAction } from '../actions/timesheetActions';
 import { uiReducer } from '../reducers/uiReducer';
 //import type { UiAction } from '../actions/uiActions';
+import {authReducer} from '../reducers/authReducer';
 
 import {
  configureStore
@@ -14,6 +15,7 @@ import {
 
 // 3. Pass BOTH types into combineReducers
 const rootReducer = combineReducers({
+  auth: authReducer,
   taskState: taskReducer,
   timesheet: timesheetReducer,
   ui: uiReducer,

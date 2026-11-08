@@ -30,7 +30,7 @@ export const timesheetReducer = (
 
   
     case "RECORD_VALUE_CHANGE": {
-      
+      is it seem better 
       const { id, remark, fromDateTime, toDateTime } = action.payload;
       
       const existingIndex = state.records.findIndex(r => r.id === id);
@@ -93,10 +93,6 @@ export const timesheetReducer = (
         records: action.payload.records.map(r => ({ ...r, isDirty: false })),
       };
     }
-
-
-      
-    
 	  
 
     case "RECORD_ADD":

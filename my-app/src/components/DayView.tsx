@@ -34,6 +34,7 @@ export const DayView: React.FC = () => {
   // save
 
   const records = useSelector((state: RootState) => state.timesheet.records);
+  const token = useSelector((state: RootState) => state.auth.token);
 
   const hasDirtyCells = records.some(r => r.isDirty);
 
@@ -47,7 +48,10 @@ export const DayView: React.FC = () => {
       // 2. Send batch payload to Laravel API
       const response = await fetch("http://127.0.0.1:8000/api/timesheets/batch", {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: { 
+          "Content-Type": "application/json", 
+          "Authorization": `Bearer ${token}`     
+        },
         body: JSON.stringify({
           date: currentDate,
           records: dirtyRecords,

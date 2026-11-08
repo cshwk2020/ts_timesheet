@@ -32,6 +32,7 @@ export type TimesheetAction =
       type: "RECORD_VALUE_CHANGE";
       payload: {
         id: string;
+        userId?: string;
         fromDateTime?: DateTimeKey;
         toDateTime?: DateTimeKey;
         remark?: string;

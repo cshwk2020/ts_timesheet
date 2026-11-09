@@ -7,7 +7,7 @@ export type TaskState = {
   tasks: Task[];
 };
 
-const initialTaskState: TaskState = {
+export const initialTaskState: TaskState = {
   taskCategories: [
     { id: "study", userId: "u1", taskCatDesc: "Study", lastUpdatedAt: "" },
     { id: "life", userId: "u1", taskCatDesc: "Life", lastUpdatedAt: "" }

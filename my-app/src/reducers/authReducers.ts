@@ -1,4 +1,4 @@
-import { AuthAction } from "../actions/authActions";
+import type { AuthAction } from "../actions/authActions";
 
 export interface AuthState {
   currentUserId: string;

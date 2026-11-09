@@ -24,9 +24,9 @@ export type TaskCategory = {
   id: string,
   userId: string,
   taskCatDesc: string,
-lastUpdatedAt: DateTimeKey
-
+  lastUpdatedAt: DateTimeKey
 }
+
 
 export type Task = {
   id: string,
@@ -36,6 +36,7 @@ export type Task = {
 lastUpdatedAt: DateTimeKey
 
 }
+
 
 export type TimesheetRecord = {
   id: string,

@@ -1,13 +1,16 @@
 import type { TimesheetAction } from "../actions/timesheetActions"
 import type { DateKey, TimesheetRecord } from "../types/timesheetTypes"
 
+
 export type TimesheetState = {
 	currentDate: DateKey,
+  currentUserId: string,
   records: TimesheetRecord[]
 }
 
 const initialState: TimesheetState = {
 	currentDate: new Date().toISOString().split("T")[0],
+  currentUserId: "u1",
   records: [
 	{
   	id: "1",
@@ -30,7 +33,7 @@ export const timesheetReducer = (
 
   
     case "RECORD_VALUE_CHANGE": {
-      is it seem better 
+      
       const { id, remark, fromDateTime, toDateTime } = action.payload;
       
       const existingIndex = state.records.findIndex(r => r.id === id);

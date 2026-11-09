@@ -1,8 +1,7 @@
 import React from "react";
-import { useSelector, useDispatch } from "react-redux";
+import { useSelector, useDispatch,type TypedUseSelectorHook } from "react-redux";
 import { TimesheetCell } from "./TimesheetCell";
-import type { RootState } from "../store";
-
+import type { RootState, AppDispatch } from "../store";
 
 const HOURS = Array.from({ length: 24 }, (_, i) => i);
 
@@ -14,9 +13,19 @@ const formatDayHeader = (dateStr: string) => {
   return `${dayName} (${dateStr})`;
 };
 
+
+export const useAppDispatch: () => AppDispatch = useDispatch;
+export const useAppSelector: TypedUseSelectorHook<RootState> = useSelector;
+
+
 export const DayView: React.FC = () => {
   
-  const dispatch = useDispatch();
+  const records = useAppSelector(state => state.timesheet.records); // TimesheetRecord[]
+;
+  
+  const dispatch = useAppDispatch();
+
+  
   const currentDate = useSelector((state: any) => state.timesheet.currentDate || new Date().toISOString().split("T")[0]);
 
   
@@ -33,7 +42,7 @@ export const DayView: React.FC = () => {
 
   // save
 
-  const records = useSelector((state: RootState) => state.timesheet.records);
+  // const records = useSelector((state: RootState) => state.timesheet.records);
   const token = useSelector((state: RootState) => state.auth.token);
 
   const hasDirtyCells = records.some(r => r.isDirty);
@@ -143,7 +152,15 @@ export const DayView: React.FC = () => {
 
       {/* Time Rows */}
       {HOURS.map((hour) => {
+        
         const hourStr = hour.toString().padStart(2, "0");
+        const targetFromTime = `${currentDate} ${hourStr}:00:00`;
+
+        // Find existing record matching the exact date and starting hour range
+        const matchingRecord = records.find(
+            (r) => r.fromDateTime === targetFromTime
+          );
+      
         return (
           <React.Fragment key={`day-hour-${hour}`}>
             {/* Hour Label Column */}
@@ -165,11 +182,14 @@ export const DayView: React.FC = () => {
 
             {/* Single Day Cell */}
             <TimesheetCell
-              key={`day-cell-${currentDate}-${hour}`}
-              date={currentDate}
-              hour={hour}
-            />
-            timesheetcell
+                  key={`day-cell-${currentDate}-${hour}`}
+                  date={currentDate}
+                  hour={hour}
+                  value={matchingRecord?.remark || ""}
+                  recordId={matchingRecord?.id}
+                  isDirty={matchingRecord?.isDirty || false}
+                />
+            
           </React.Fragment>
         );
       })}

@@ -1,6 +1,26 @@
+import type { TimesheetRecord } from '../types/timesheetTypes';
+import axiosClient from './axiosClient';
+ 
 const API_BASE_URL = "http://127.0.0.1:8000/api";
 
+
+export const getTimesheets = async () => {
+  const response = await axiosClient.get('/timesheets');
+  return response.data;
+};
+
+export const createTimesheet = async (data: TimesheetRecord) => {
+  const response = await axiosClient.post('/timesheets', data);
+  return response.data;
+};
+
+export const deleteTimesheet = async (id: number) => {
+  const response = await axiosClient.delete(`/timesheets/${id}`);
+  return response.data;
+};
+
 export const timesheetApi = {
+  
   // Batch save dirty records
   async batchSave(token: string, records: any[]) {
     const response = await fetch(`${API_BASE_URL}/timesheets/batch`, {

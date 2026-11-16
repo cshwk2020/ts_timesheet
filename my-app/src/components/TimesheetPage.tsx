@@ -1,3 +1,4 @@
+ 
 import React, { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import type { RootState, AppDispatch } from "../store";
@@ -34,7 +35,7 @@ export const TimesheetPage: React.FC = () => {
         {viewMode === "day" ? <DayView /> : <WeekView />}
       </div>
 
-      {/* 浮動式 Cell Editor Popup */}
+   
       <CellPopupEditor />
       
     </div>

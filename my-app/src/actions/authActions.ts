@@ -11,7 +11,7 @@ export type AuthAction =
   | { type: "LOGOUT" };
 
 
-  
+
 
 interface LoginCredentials {
   email: string;
@@ -19,6 +19,9 @@ interface LoginCredentials {
 }
 
 export const loginUser = (credentials: LoginCredentials) => {
+
+  console.log("loginUser......", JSON.stringify(credentials));
+
   return async (dispatch: AppDispatch) => {
     try {
       // 1. Call your Laravel API login endpoint
@@ -33,13 +36,15 @@ export const loginUser = (credentials: LoginCredentials) => {
 
       const data = await response.json();
 
+      console.log("data==", data);
+
       if (!response.ok) {
         throw new Error(data.message || "Invalid email or password");
       }
 
       // Expected response structure from Laravel: { token, user: { id, ... } or userId }
-      const token = data.token;
-      const userId = data.userId || data.user?.id;
+      const token = data?.access_token;
+      const userId = data?.user?.id;
 
       if (!token || !userId) {
         throw new Error("Invalid response structure from server");

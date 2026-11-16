@@ -1,5 +1,4 @@
-import { AppDispatch } from "../store";
-import { getCurrentWeekRange } from "../utils/dateUtils";
+import type { AppDispatch } from "../store";
 import { fetchInitialRecords } from "./timesheetActions"; // Separate data loading thunk
 
 export type AuthAction = 
@@ -10,6 +9,66 @@ export type AuthAction =
       } 
     }
   | { type: "LOGOUT" };
+
+
+  
+
+interface LoginCredentials {
+  email: string;
+  password: string;
+}
+
+export const loginUser = (credentials: LoginCredentials) => {
+  return async (dispatch: AppDispatch) => {
+    try {
+      // 1. Call your Laravel API login endpoint
+      const response = await fetch("http://127.0.0.1:8000/api/login", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "Accept": "application/json",
+        },
+        body: JSON.stringify(credentials),
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.message || "Invalid email or password");
+      }
+
+      // Expected response structure from Laravel: { token, user: { id, ... } or userId }
+      const token = data.token;
+      const userId = data.userId || data.user?.id;
+
+      if (!token || !userId) {
+        throw new Error("Invalid response structure from server");
+      }
+
+      // 2. Save token and current_user_id to match checkStoredSession keys
+      localStorage.setItem("auth_token", token);
+      localStorage.setItem("current_user_id", String(userId));
+
+      // 3. Dispatch LOGIN_SUCCESS with your exact payload structure
+      dispatch({
+        type: "LOGIN_SUCCESS",
+        payload: {
+          userId: String(userId),
+          token,
+        },
+      });
+
+      // 4. Trigger initial data load (matching checkStoredSession behavior)
+      dispatch(fetchInitialRecords(token, String(userId)));
+
+      return data;
+    } catch (error: any) {
+      throw new Error(error.message || "Unable to connect to the server");
+    }
+  };
+};
+  
+
 
 
 

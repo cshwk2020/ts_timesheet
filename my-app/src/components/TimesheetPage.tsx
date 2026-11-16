@@ -1,12 +1,12 @@
 import React, { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import type { RootState } from "../store";
-import { checkStoredSession } from "./actions/authActions";
+import type { RootState, AppDispatch } from "../store";
+import { checkStoredSession } from "../actions/authActions";
 import { Toolbar } from "./Toolbar";
 import { DayView } from "./DayView";
 import { WeekView } from "./WeekView";
 import { CellPopupEditor } from "./CellPopupEditor";
-
+import { LoginPage } from "./LoginPage";
 
 export const TimesheetPage: React.FC = () => {
 
@@ -20,7 +20,8 @@ export const TimesheetPage: React.FC = () => {
   }, [dispatch]);
 
   if (!isAuthenticated) {
-    return <div>Checking session / Please log in...</div>;
+    //return <div>Checking session / Please log in...</div>;
+    return <LoginPage />;
   }
   
   return (

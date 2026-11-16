@@ -13,7 +13,8 @@ class AuthController extends Controller
     {
         $credentials = $request->only('email', 'password');
 
-        if (! $token = auth()->attempt($credentials)) {
+        // Use auth('api') so it attempts login via JWT instead of sessions
+        if (! $token = auth('api')->attempt($credentials)) {
             return response()->json(['error' => 'Unauthorized'], 401);
         }
 
@@ -23,13 +24,13 @@ class AuthController extends Controller
     // Get authenticated user details
     public function userProfile()
     {
-        return response()->json(auth()->user());
+        return response()->json(auth('api')->user());
     }
 
     // Logout (Invalidate token)
     public function logout()
     {
-        auth()->logout();
+        auth('api')->logout();
         return response()->json(['message' => 'Successfully logged out']);
     }
 
@@ -39,7 +40,8 @@ class AuthController extends Controller
         return response()->json([
             'access_token' => $token,
             'token_type' => 'bearer',
-            'expires_in' => auth()->factory()->getTTL() * 60
+            'expires_in' => auth('api')->factory()->getTTL() * 60,
+            'user' => auth('api')->user() // Optional: helpful to return user profile right on login
         ]);
     }
 }

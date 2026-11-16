@@ -1,7 +1,6 @@
-import type { TimesheetAction } from "../actions/timesheetActions"
 import type { DateKey, TimesheetRecord } from "../types/timesheetTypes"
 import { getCurrentWeekRange } from "../utils/dateUtils";
-import type { TimesheetState, TimesheetAction } from "../types";
+import type { TimesheetAction } from "../actions/timesheetActions";
 
 const weekRange = getCurrentWeekRange();
 
@@ -9,7 +8,9 @@ const weekRange = getCurrentWeekRange();
 export type TimesheetState = {
 	currentDate: DateKey,
   currentUserId: string,
-  records: TimesheetRecord[]
+  records: TimesheetRecord[],
+  startDate: Date,
+  endDate: Date,
 }
 
 
@@ -17,8 +18,8 @@ const initialState: TimesheetState = {
   currentDate: weekRange.today,
   currentUserId: "u1",
   records: [],
-  startDate: weekRange.startDate,
-  endDate: weekRange.endDate,
+  startDate: new Date(weekRange.startDate),
+  endDate: new Date(weekRange.endDate),
 };
 
 

@@ -1,8 +1,16 @@
-import type { DateTimeKey, DateKey,TimesheetRecord } from "../types/timesheetTypes"
-  
 import type { Dispatch } from "redux";
+import { AppDispatch, RootState } from "../store";
+
+import { timesheetApi } from "../services/timesheetApi";
+import { getCurrentWeekRange, getWeekRangeForDate } from "../utils/dateUtils";
+import type { DateTimeKey, DateKey,TimesheetRecord } from "../types/timesheetTypes"
+
 
 export type TimesheetAction =
+    | {
+      type: "SET_INITIAL_RECORDS";
+      payload: TimesheetRecord[];
+    }
   | {
   	type: "RECORD_ADD",
   	payload: TimesheetRecord
@@ -45,53 +53,90 @@ export type TimesheetAction =
 	;
 
 
-// Async action to change day and fetch records from Laravel backend
-export const changeDayAndFetch = (daysToAdd: number) => {
-  return async (dispatch: Dispatch<TimesheetAction>, getState: any) => {
-    const state = getState();
-    
-    // 1. Calculate the new date string
-    const currentDate = new Date(state.timesheet.currentDate);
-    currentDate.setDate(currentDate.getDate() + daysToAdd);
-    const newDateStr = currentDate.toISOString().split("T")[0] as DateKey;
+import { AppDispatch, RootState } from "../store";
+import { timesheetApi } from "../services/timesheetApi";
 
-    try {
-      // 2. Fetch tasks/records for this specific date from your Laravel API
-      // Adjust endpoint URL to match your Laravel routing (e.g., /api/timesheets?date=YYYY-MM-DD)
-      const response = await fetch(`http://127.0.0.1:8000/api/timesheets?date=${newDateStr}`, {
-        method: "GET",
-        headers: {
-          "Content-Type": "application/json",
-          // Add Authorization token here if your Laravel API uses Sanctum/JWT
-        },
-      });
+export const saveDirtyRecords = () => async (dispatch: AppDispatch, getState: () => RootState) => {
+  const state = getState();
+  const token = state.auth.token;
+  const records = state.timesheet.records;
 
-      if (!response.ok) {
-        throw new Error("Failed to fetch records from Laravel API");
-      }
+  const dirtyRecords = records.filter(r => r.isDirty);
+  if (dirtyRecords.length === 0) return;
 
-      const records: TimesheetRecord[] = await response.json();
+  try {
+    // Call the isolated API service
+    await timesheetApi.batchSave(token!, dirtyRecords);
 
-      // 3. Dispatch a combined action to update both date and records in Redux
-      dispatch({
-        type: "SET_DATE_AND_RECORDS",
-        payload: {
-          currentDate: newDateStr,
-          records: records,
-        },
-      });
-    } catch (error) {
-      console.error("Error fetching day records:", error);
-      // Fallback: Just update the date even if the API call fails or is offline
-      dispatch({
-        type: "CHANGE_DAY",
-        payload: daysToAdd,
-      });
-    }
-  };
+    // Update Redux state on success
+    dispatch({ type: "SAVE_SUCCESS" });
+    console.log("Synced dirty records to Laravel DB!");
+  } catch (error) {
+    console.error("Save error:", error);
+    // Optionally dispatch a SAVE_FAILURE action here if you track error states in Redux
+  }
 };
 
-  
-  
-  
-  
+
+
+// 1. Core private helper for fetching and hydrating Redux state
+const fetchAndHydrateTimesheets = async (
+  dispatch: AppDispatch,
+  token: string,
+  userId: string,
+  startDate: string,
+  endDate: string
+) => {
+  try {
+    const data = await timesheetApi.fetchRange(token, userId, startDate, endDate);
+
+    // Hydrate store with records and clear dirty flags
+    dispatch({
+      type: "SET_INITIAL_RECORDS",
+      payload: data,
+    });
+  } catch (error) {
+    console.error("Timesheet fetch error:", error);
+  }
+};
+
+
+
+// 2. Initial app load fetch (uses current week range)
+export const fetchInitialRecords = (token: string, userId: string) => async (dispatch: AppDispatch) => {
+  const { startDate, endDate } = getCurrentWeekRange();
+  await fetchAndHydrateTimesheets(dispatch, token, userId, startDate, endDate);
+};
+
+
+
+// 3. Navigation fetch (changing days/weeks via service + clean fallback)
+export const changeDayAndFetch = (daysToAdd: number) => async (dispatch: AppDispatch, getState: () => RootState) => {
+  const state = getState();
+  const token = state.auth.token;
+  const userId = state.auth.currentUserId;
+
+  if (!token || !userId) return;
+
+  // Optimistically update the active date in Redux state first
+  dispatch({ type: "CHANGE_DAY", payload: daysToAdd });
+
+  // Get the newly updated currentDate from state and compute its range
+  const updatedDateStr = getState().timesheet.currentDate;
+  const { startDate, endDate } = getWeekRangeForDate(updatedDateStr);
+
+  try {
+    // Fetch records via the service layer
+    const data = await timesheetApi.fetchRange(token, userId, startDate, endDate);
+
+    // Update records for the new range
+    dispatch({
+      type: "SET_INITIAL_RECORDS",
+      payload: data,
+    });
+  } catch (error) {
+    console.error("Error fetching navigation records:", error);
+    // Note: The date is already changed locally, but if the API fails, 
+    // you can choose how to handle fallback behavior here if needed.
+  }
+};

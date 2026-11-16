@@ -1,5 +1,9 @@
 import type { TimesheetAction } from "../actions/timesheetActions"
 import type { DateKey, TimesheetRecord } from "../types/timesheetTypes"
+import { getCurrentWeekRange } from "../utils/dateUtils";
+import type { TimesheetState, TimesheetAction } from "../types";
+
+const weekRange = getCurrentWeekRange();
 
 
 export type TimesheetState = {
@@ -8,6 +12,17 @@ export type TimesheetState = {
   records: TimesheetRecord[]
 }
 
+
+const initialState: TimesheetState = {
+  currentDate: weekRange.today,
+  currentUserId: "u1",
+  records: [],
+  startDate: weekRange.startDate,
+  endDate: weekRange.endDate,
+};
+
+
+/*
 const initialState: TimesheetState = {
 	currentDate: new Date().toISOString().split("T")[0],
   currentUserId: "u1",
@@ -23,6 +38,8 @@ const initialState: TimesheetState = {
 	}
   ]
 }
+*/
+
 
 export const timesheetReducer = (
   state = initialState,
@@ -30,6 +47,14 @@ export const timesheetReducer = (
 ): TimesheetState => {
   
   switch (action.type) {
+
+
+    case "SET_INITIAL_RECORDS": {
+      return {
+        ...state,
+        records: action.payload.map(r => ({ ...r, isDirty: false })),
+      };
+    }
 
   
     case "RECORD_VALUE_CHANGE": {

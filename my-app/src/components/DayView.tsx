@@ -39,6 +39,30 @@ export const DayView: React.FC = () => {
     dispatch({ type: "CHANGE_DAY", payload: 1 });
   };
 
+  const handleSaveAll = async () => {
+  const dirtyRecords = records.filter((r: TimesheetRecord) => r.isDirty);
+  if (dirtyRecords.length === 0) return;
+
+  try {
+    const response = await fetch("http://127.0.0.1:8000/api/timesheets/batch", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`,
+      },
+      body: JSON.stringify({ records: dirtyRecords }),
+    });
+
+    if (!response.ok) throw new Error("Batch save failed");
+
+    dispatch({ type: "SAVE_SUCCESS" });
+    console.log("Synced dirty records to Laravel DB!");
+  } catch (error) {
+    console.error("Save error:", error);
+  }
+};
+
+
 
   // save
 

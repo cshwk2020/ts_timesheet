@@ -5,8 +5,8 @@ import { loginUser } from "../actions/authActions";
 
 export const LoginPage: React.FC = () => {
   const dispatch = useDispatch<AppDispatch>();
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
+  const [email, setEmail] = useState("test@example.com");
+  const [password, setPassword] = useState("pass");
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
 

@@ -1,29 +1,41 @@
-import React, { useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import { useDispatch } from "react-redux";
 import type { AppDispatch } from "../store";
 import { loginUser } from "../actions/authActions";
 
+ 
 export const LoginPage: React.FC = () => {
+
   const dispatch = useDispatch<AppDispatch>();
   const [email, setEmail] = useState("test@example.com");
   const [password, setPassword] = useState("pass");
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
+  // Pure async function — no event needed
+  const doLogin = useCallback(async () => {
     setError("");
     setLoading(true);
-
     try {
-      // Dispatch your Redux login action
       await dispatch(loginUser({ email, password }));
     } catch (err: any) {
       setError(err.message || "Login failed. Please check your credentials.");
     } finally {
       setLoading(false);
     }
+  }, [dispatch, email, password]);
+
+  // Auto-submit once on mount
+  useEffect(() => {
+    doLogin();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []); // empty deps = only on mount
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    await doLogin();
   };
+ 
 
   return (
     <div style={{
